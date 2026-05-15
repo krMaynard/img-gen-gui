@@ -203,7 +203,8 @@ class App(tk.Tk):
                 self.after(0, self._log, f"Model: {part.text.strip()}")
             elif part.inline_data:
                 image = Image.open(BytesIO(part.inline_data.data))
-                filename = os.path.join(out_dir, f"{MODEL_NAME}_{random.randint(0, 99999)}.png")
+                ts = time.strftime("%Y%m%d_%H%M%S")
+                filename = os.path.join(out_dir, f"{MODEL_NAME}_{ts}_{random.randint(0, 999)}.png")
                 image.save(filename)
                 return filename
 

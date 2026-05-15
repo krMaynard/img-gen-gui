@@ -6,6 +6,7 @@ import random
 import subprocess
 import sys
 import threading
+import time
 import tkinter as tk
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from io import BytesIO

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """GUI for Gemini image generation with API key stored in the system keychain."""
 
+import json
 import os
 import random
 import subprocess
@@ -8,6 +9,7 @@ import sys
 import threading
 import time
 import tkinter as tk
+import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from io import BytesIO
 from tkinter import filedialog, messagebox, simpledialog, ttk
@@ -17,9 +19,12 @@ from google import genai
 from google.genai import types
 from PIL import Image
 
+__version__ = "1.0.0"
+
 MODEL_NAME = "gemini-3-pro-image-preview"
 KEYRING_SERVICE = "gemini-image-gen"
 KEYRING_USERNAME = "api_key"
+RELEASES_API = "https://api.github.com/repos/krmaynard/img-gen-gui/releases/latest"
 
 DEFAULT_PROMPT = (
     "Create a clear, professional flowchart diagram illustrating a language "
@@ -27,6 +32,10 @@ DEFAULT_PROMPT = (
     "audio, LLM building vocabulary lists, and an image model creating "
     "illustrated vocabulary cards. Show these steps in a repeating cycle."
 )
+
+
+def _parse_version(tag: str) -> tuple[int, ...]:
+    return tuple(int(x) for x in tag.lstrip("v").split("."))
 
 
 def load_api_key() -> str | None:
@@ -48,6 +57,7 @@ class App(tk.Tk):
         self.resizable(False, False)
         self._build_ui()
         self._refresh_key_status()
+        threading.Thread(target=self._check_for_update, daemon=True).start()
 
     def _build_ui(self):
         pad = {"padx": 10, "pady": 6}
@@ -100,6 +110,26 @@ class App(tk.Tk):
         self.log.configure(yscrollcommand=scroll.set)
         self.log.pack(side="left", fill="both", expand=True)
         scroll.pack(side="right", fill="y")
+
+    # -- Update check --
+
+    def _check_for_update(self):
+        try:
+            req = urllib.request.Request(RELEASES_API, headers={"User-Agent": "img-gen-gui"})
+            with urllib.request.urlopen(req, timeout=5) as resp:
+                data = json.loads(resp.read())
+            latest_tag = data.get("tag_name", "")
+            if not latest_tag:
+                return
+            if _parse_version(latest_tag) > _parse_version(__version__):
+                url = data.get("html_url", RELEASES_API)
+                self.after(
+                    0,
+                    self._log,
+                    f"Update available: {latest_tag} (you have v{__version__}) — {url}",
+                )
+        except Exception:
+            pass  # silently skip if offline or rate-limited
 
     # -- Key management --
 

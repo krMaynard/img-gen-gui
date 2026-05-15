@@ -2,7 +2,7 @@
 
 ## Project overview
 
-Single-file Python desktop GUI (`generate_image_gui.py`) for batch image generation via the Gemini API. Uses tkinter for the UI and stores the API key in the macOS Keychain via `keyring`.
+Single-file Python desktop GUI (`generate_image_gui.py`) for batch image generation via the Gemini API. Uses tkinter for the UI and stores the API key in the system keychain via `keyring`.
 
 ## Environment setup
 
@@ -33,8 +33,8 @@ No CLI arguments. The GUI handles all configuration.
 
 - **`App(tk.Tk)`** — single class, all UI and logic lives here.
 - **Threading model**: the tkinter main loop runs on the main thread. Generation runs in a `threading.Thread`; individual image requests run inside a `ThreadPoolExecutor`. All UI updates from background threads go through `self.after(0, ...)` — never call tkinter widgets directly from a non-main thread.
-- **Update check**: runs in a daemon thread at startup (`_check_for_update`). Hits the GitHub Releases API, compares tags with `_parse_version` (uses `re.findall` to handle pre-release suffixes like `-beta`), and logs a link if a newer version exists. Failures print to `stderr` and do not surface in the UI.
-- **API key**: stored in the macOS Keychain under service `gemini-image-gen` / username `api_key`. Never written to disk in plain text.
+- **Update check**: runs in a daemon thread at startup (`_check_for_update`). Hits the GitHub Releases API, compares tags with `_parse_version` (uses `re.findall` to extract numeric components, effectively ignoring non-numeric suffixes like `-beta`), and logs a link if a newer version exists. Failures print to `stderr` and do not surface in the UI.
+- **API key**: stored in the system keychain under service `gemini-image-gen` / username `api_key`. Never written to disk in plain text.
 
 ## Versioning
 

@@ -154,7 +154,11 @@ class App(tk.Tk):
 
         count = self.count_var.get()
         out_dir = self.out_dir_var.get()
-        os.makedirs(out_dir, exist_ok=True)
+        try:
+            os.makedirs(out_dir, exist_ok=True)
+        except Exception as e:
+            messagebox.showerror("Error", f"Could not create output directory: {e}")
+            return
 
         self.gen_btn.config(state="disabled")
         self.progress.start(12)

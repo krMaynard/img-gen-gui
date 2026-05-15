@@ -4,6 +4,7 @@
 import json
 import os
 import random
+import re
 import subprocess
 import sys
 import threading
@@ -35,7 +36,7 @@ DEFAULT_PROMPT = (
 
 
 def _parse_version(tag: str) -> tuple[int, ...]:
-    return tuple(int(x) for x in tag.lstrip("v").split("."))
+    return tuple(int(x) for x in re.findall(r"\d+", tag))
 
 
 def load_api_key() -> str | None:
@@ -128,8 +129,8 @@ class App(tk.Tk):
                     self._log,
                     f"Update available: {latest_tag} (you have v{__version__}) — {url}",
                 )
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"Update check failed: {e}", file=sys.stderr)
 
     # -- Key management --
 

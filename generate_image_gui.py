@@ -34,6 +34,8 @@ DEFAULT_PROMPT = (
     "illustrated vocabulary cards. Show these steps in a repeating cycle."
 )
 
+DEFAULT_OUTPUT_DIR = "~/Desktop"
+
 
 def _parse_version(tag: str) -> tuple[int, ...]:
     return tuple(int(x) for x in re.findall(r"\d+", tag))
@@ -111,7 +113,7 @@ class App(tk.Tk):
         ttk.Spinbox(opts, from_=1, to=10, width=4, textvariable=self.count_var).pack(side="left", padx=(4, 16))
 
         ttk.Label(opts, text="Output folder:").pack(side="left")
-        self.out_dir_var = tk.StringVar(value=os.path.expanduser("~/Pictures/genai"))
+        self.out_dir_var = tk.StringVar(value=os.path.expanduser(DEFAULT_OUTPUT_DIR))
         ttk.Entry(opts, textvariable=self.out_dir_var, width=28).pack(side="left", padx=4)
         ttk.Button(opts, text="Browse…", command=self._browse).pack(side="left")
 

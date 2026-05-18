@@ -6,7 +6,7 @@ A lightweight desktop GUI for batch image generation using the Gemini API. Enter
 
 - **Batch generation** — generate 1–10 images from a single prompt in parallel
 - **Secure API key storage** — key is saved to the macOS Keychain via `keyring`; never stored in plain text
-- **Configurable output folder** — defaults to `~/Pictures/genai`, browseable from the UI
+- **Configurable output folder** — defaults to `~/Desktop/genai`, browseable from the UI
 - **Live log** — dark-themed scrollable log shows model responses and saved file paths as they arrive
 - **Auto-open on macOS** — each saved image is opened in Preview automatically
 - **Update notifications** — checks GitHub Releases on startup and logs a link if a newer version is available

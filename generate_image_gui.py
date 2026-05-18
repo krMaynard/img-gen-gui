@@ -238,19 +238,12 @@ class App(tk.Tk):
             return
 
         input_paths = list(self.input_images)
-        try:
-            input_images = [Image.open(p) for p in input_paths]
-            for img in input_images:
-                img.load()
-        except Exception as e:
-            messagebox.showerror("Error", f"Could not open input image: {e}")
-            return
 
         self.gen_btn.config(state="disabled")
         self.progress.start(12)
         threading.Thread(
             target=self._run_generation,
-            args=(api_key, prompt, count, out_dir, input_images),
+            args=(api_key, prompt, count, out_dir, input_paths),
             daemon=True,
         ).start()
 
@@ -260,9 +253,15 @@ class App(tk.Tk):
         prompt: str,
         count: int,
         out_dir: str,
-        input_images: list,
+        input_paths: list[str],
     ):
+        input_images: list[Image.Image] = []
         try:
+            for p in input_paths:
+                img = Image.open(p)
+                img.load()
+                input_images.append(img)
+
             client = genai.Client(api_key=api_key)
             if input_images:
                 self.after(0, self._log, f"Sending {count} request(s) with {len(input_images)} input image(s)…")
@@ -286,6 +285,8 @@ class App(tk.Tk):
         except Exception as exc:
             self.after(0, self._log, f"Error: {exc}")
         finally:
+            for img in input_images:
+                img.close()
             self.after(0, self._finish_generation)
 
     def _generate_one(
@@ -293,9 +294,9 @@ class App(tk.Tk):
         client: genai.Client,
         prompt: str,
         out_dir: str,
-        input_images: list,
+        input_images: list[Image.Image],
     ) -> str | None:
-        contents: list = [prompt, *input_images] if input_images else prompt
+        contents = [prompt, *input_images]
         response = client.models.generate_content(
             model=MODEL_NAME,
             contents=contents,

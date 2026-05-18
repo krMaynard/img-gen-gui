@@ -34,7 +34,7 @@ DEFAULT_PROMPT = (
     "illustrated vocabulary cards. Show these steps in a repeating cycle."
 )
 
-DEFAULT_OUTPUT_DIR = "~/Desktop"
+DEFAULT_OUTPUT_DIR = "~/Desktop/genai"
 
 
 def _parse_version(tag: str) -> tuple[int, ...]:
